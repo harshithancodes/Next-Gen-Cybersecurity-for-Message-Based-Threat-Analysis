@@ -1130,11 +1130,11 @@ class EnhancedGmailAPIClient:
         
         try:
             user_info = self.service.users().getProfile(userId='me').execute()
-            self.current_account = user_info.get('emailAddress', 'Unknown')
+            self.current_account = user_info.get('emailAddress', 'Connected Gmail')
             logger.info(f"Gmail API authenticated for: {self.current_account}")
         except Exception as e:
             logger.warning(f"Could not get account info: {e}")
-            self.current_account = "Connected Account"
+            self.current_account = "harshithandata@gmail.com"
     
     def get_messages(self, query: str = '', max_results: int = 100) -> List[Dict]:
         """Get messages with enhanced query options"""
