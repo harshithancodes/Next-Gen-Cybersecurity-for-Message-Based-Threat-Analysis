@@ -1080,7 +1080,7 @@ class AdvancedThreatDetectionModels:
 class EnhancedGmailAPIClient:
     """Enhanced Gmail API client with comprehensive email analysis"""
     
-    def __init__(self, credentials_path: str = 'credentials.json'):
+    def __init__(self, credentials_path: str = '/etc/secrets/credentials.json'):
         self.credentials_path = credentials_path
         self.SCOPES = [
             'openid',
