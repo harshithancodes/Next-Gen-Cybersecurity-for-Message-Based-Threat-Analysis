@@ -29,6 +29,7 @@ asyncio==3.4.3
 python-dotenv==1.0.0
 colorama==0.4.6
 tqdm==4.65.0
+gunicorn==23.0.0
 
 # Built-in Python libraries used (no installation needed):
 # - sqlite3 (for data storage)
