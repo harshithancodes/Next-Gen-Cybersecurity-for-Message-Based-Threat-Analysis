@@ -76,9 +76,9 @@ Web Dashboard
 
 ### Threat Detection
 
-![Threat Detection](Screenshots/Threat-detection.png)
+![Threat Detection](Screenshots/Threat Detection.png)
 
 ### Results Screen
 
-![Results Screen](Screenshots/results-screen.png)
+![Results Screen](Screenshots/Results Screen.png)
 
