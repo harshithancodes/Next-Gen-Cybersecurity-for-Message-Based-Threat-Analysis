@@ -72,13 +72,13 @@ Web Dashboard
 
 ### Cybersecurity Dashboard
 
-![Cybersecurity Dashboard](screenshots/dashboard.png)
+![Cybersecurity Dashboard](Screenshots/dashboard.png)
 
 ### Threat Detection
 
-![Threat Detection](screenshots/threat-detection.png)
+![Threat Detection](Screenshots/threat-detection.png)
 
 ### Results Screen
 
-![Results Screen](screenshots/results-screen.png)
+![Results Screen](Screenshots/results-screen.png)
 
