@@ -1098,7 +1098,7 @@ class EnhancedGmailAPIClient:
         
         if os.path.exists('token.json'):
             try:
-                creds = Credentials.from_authorized_user_file('token.json', self.SCOPES)
+                creds = Credentials.from_authorized_user_file('/etc/secrets/token.json', self.SCOPES)
             except Exception as e:
                 logger.warning(f"Could not load existing token: {e}")
                 if os.path.exists('token.json'):
