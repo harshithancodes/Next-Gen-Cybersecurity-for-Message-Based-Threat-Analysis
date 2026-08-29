@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Gmail Threat Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .production-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .enhanced-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .account-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .current-account {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .account-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 184, 148, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0); }
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 3px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+        .btn-success { background: linear-gradient(45deg, #56ab2f, #a8e6cf); color: white; }
+        .btn-danger { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; }
+        .btn-warning { background: linear-gradient(45deg, #f39c12, #f1c40f); color: white; }
+        .btn-secondary { background: linear-gradient(45deg, #95a5a6, #7f8c8d); color: white; }
+
+        .btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25); 
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: 700;
+            margin: 15px 0;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-number.critical { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-number.high { 
+            background: linear-gradient(45deg, #fd79a8, #e84393);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-number.medium { 
+            background: linear-gradient(45deg, #fdcb6e, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-number.safe { 
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .threat-detection-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 8px 35px rgba(0,0,0,0.1);
+        }
+
+        .console-panel {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 8px 35px rgba(0,0,0,0.2);
+            color: #00ff00;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .console-panel .panel-header {
+            border-bottom: 2px solid #333;
+        }
+
+        .panel-header h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .console-panel .panel-header h2 {
+            color: #00ff00;
+        }
+
+        .console-content {
+            height: 450px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+            border: 1px solid #333;
+        }
+
+        .console-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .console-content::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        .console-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 6px;
+            padding: 3px 0;
+        }
+
+        .log-timestamp {
+            color: #888;
+        }
+
+        .log-level-critical { color: #ff4757; font-weight: bold; }
+        .log-level-high { color: #ffa502; font-weight: bold; }
+        .log-level-medium { color: #3742fa; }
+        .log-level-low { color: #2ed573; }
+        .log-level-info { color: #00d2d3; }
+        .log-level-safe { color: #5f27cd; }
+
+        .threat-item {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .threat-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .threat-critical { border-left-color: #ff6b6b; background: linear-gradient(90deg, #fff, #fff5f5); }
+        .threat-high { border-left-color: #fd79a8; background: linear-gradient(90deg, #fff, #fff0f6); }
+        .threat-medium { border-left-color: #fdcb6e; background: linear-gradient(90deg, #fff, #fffbf0); }
+        .threat-low { border-left-color: #74b9ff; background: linear-gradient(90deg, #fff, #f0f8ff); }
+        .threat-safe { border-left-color: #00b894; background: linear-gradient(90deg, #fff, #f0fff4); }
+
+        .threat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .threat-badge {
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-critical { background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; }
+        .badge-high { background: linear-gradient(45deg, #fd79a8, #e84393); color: white; }
+        .badge-medium { background: linear-gradient(45deg, #fdcb6e, #f39c12); color: white; }
+        .badge-low { background: linear-gradient(45deg, #74b9ff, #0984e3); color: white; }
+        .badge-safe { background: linear-gradient(45deg, #00b894, #00cec9); color: white; }
+
+        .threat-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 12px;
+        }
+
+        .threat-metric {
+            text-align: center;
+        }
+
+        .threat-metric-label {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .threat-metric-value {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .controls-section {
+            margin: 25px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+        }
+
+        .controls-section h3 {
+            margin-bottom: 20px;
+            color: #1e3c72;
+            font-weight: 700;
+        }
+
+        .no-threats {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .no-threats .icon {
+            font-size: 5em;
+            margin-bottom: 25px;
+            opacity: 0.3;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-scroll {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .auto-scroll input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            color: #666;
+            box-shadow: 0 8px 35px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected { background: #00b894; }
+        .status-error { background: #ff6b6b; }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .header h1 { font-size: 2.2em; }
+            .account-section { flex-direction: column; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Enhanced Gmail Threat Detection</h1>
+            <div class="production-badge">PRODUCTION SYSTEM</div>
+            <div class="enhanced-badge">ENHANCED AI</div>
+            
+            <!-- Account Section -->
+            <div class="account-section">
+                <div class="current-account">
+                    <span class="account-indicator"></span>
+                    <div>
+                        <strong>Connected Account:</strong>
+                        <span id="currentAccount">Loading...</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="refreshAll()">Refresh System</button>
+                    <button class="btn btn-success" id="monitoringToggle" onclick="toggleMonitoring()">Stop Monitoring</button>
+                    <button class="btn btn-warning" onclick="testAdvancedThreatDetection()">Test Enhanced Detection</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalAnalyzed">0</div>
+                <div><strong>Total Analyzed</strong></div>
+                <small>All emails processed</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number critical" id="criticalThreats">0</div>
+                <div><strong>Critical Threats</strong></div>
+                <small>Immediate action required</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number high" id="highThreats">0</div>
+                <div><strong>High Risk</strong></div>
+                <small>Investigation required</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number medium" id="mediumThreats">0</div>
+                <div><strong>Medium Risk</strong></div>
+                <small>Monitor closely</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number safe" id="safeEmails">0</div>
+                <div><strong>Safe Emails</strong></div>
+                <small>No threats detected</small>
+            </div>
+        </div>
+
+        <!-- Enhanced Threat Type Analysis -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="phishingCount">0</div>
+                <div><strong>Phishing Detected</strong></div>
+                <small>Including BEC & Spear-phishing</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #e17055, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="aptCount">0</div>
+                <div><strong>APT Detected</strong></div>
+                <small>Advanced Persistent Threats</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #fd79a8, #e84393); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="malwareCount">0</div>
+                <div><strong>Malware Detected</strong></div>
+                <small>Ransomware & Trojans</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="ddosCount">0</div>
+                <div><strong>DDoS Indicators</strong></div>
+                <small>Attack patterns detected</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #fd79a8, #fdcb6e); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="insiderCount">0</div>
+                <div><strong>Insider Threats</strong></div>
+                <small>Internal risk indicators</small>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="background: linear-gradient(45deg, #00b894, #55efc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="systemStatus">Loading...</div>
+                <div><strong>System Status</strong></div>
+                <small>Enhanced AI Monitoring</small>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Enhanced Threat Detection Panel -->
+            <div class="threat-detection-panel">
+                <div class="panel-header">
+                    <h2>Enhanced Threat Detection <span id="loadingIndicator" class="loading" style="display: none;"></span></h2>
+                    <div>
+                        <select id="threatFilter" onchange="filterThreats()">
+                            <option value="all">All Detections</option>
+                            <option value="critical">Critical Only</option>
+                            <option value="high">High+ Risk</option>
+                            <option value="medium">Medium+ Risk</option>
+                            <option value="threats">All Threats</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="refreshThreats()">Refresh</button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Controls Section -->
+                <div class="controls-section">
+                    <h3>Enhanced System Controls</h3>
+                    <button class="btn btn-primary" onclick="manualScan()">Manual Scan</button>
+                    <button class="btn btn-warning" onclick="analyzeTestEmail()">Analyze Email</button>
+                    <button class="btn btn-danger" onclick="testAPTDetection()">Test APT</button>
+                    <button class="btn btn-danger" onclick="testInsiderThreat()">Test Insider Threat</button>
+                    <button class="btn btn-secondary" onclick="exportEnhancedData()">Export Data</button>
+                    <button class="btn btn-secondary" onclick="clearThreatCache()">Clear Cache</button>
+                </div>
+
+                <div id="threatsContainer">
+                    <div class="no-threats">
+                        <div class="icon">🛡️</div>
+                        <h3>Loading enhanced threat detection data...</h3>
+                        <p>Connecting to comprehensive threat detection system...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Console Panel -->
+            <div class="console-panel">
+                <div class="panel-header">
+                    <h2>🖥️ Enhanced System Console</h2>
+                    <div class="auto-scroll">
+                        <input type="checkbox" id="autoScroll" checked>
+                        <label for="autoScroll" style="color: #00ff00;">Auto-scroll</label>
+                        <button class="btn btn-secondary" onclick="clearConsole()" style="padding: 6px 12px; font-size: 12px;">Clear</button>
+                    </div>
+                </div>
+                <div class="console-content" id="consoleContent">
+                    <div class="log-entry log-level-info">
+                        <span class="log-timestamp">[SYSTEM]</span> Enhanced threat detection system initializing...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <span class="status-indicator status-connected" id="systemHealthIndicator"></span>
+                <strong>Enhanced System:</strong> <span id="systemHealth">Loading...</span> | 
+                <strong>Last Update:</strong> <span id="lastUpdate">--</span> | 
+                <strong>API Status:</strong> <span id="apiStatus">Connecting...</span> |
+                <strong>AI Models:</strong> Phishing, APT, Insider Threat, DDoS, Malware |
+                <strong>Behavioral Analysis:</strong> Active
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isMonitoring = true;
+        let currentAccount = '';
+        let threatsData = [];
+        let refreshInterval;
+        let consoleUpdateInterval;
+        let apiBaseUrl = window.location.origin;
+        
+        // Initialize enhanced dashboard
+        async function initEnhancedDashboard() {
+            console.log('Initializing Enhanced Gmail Threat Detection Dashboard...');
+            addConsoleLog('info', 'Enhanced production dashboard initializing...');
+            
+            try {
+                // Load initial data
+                await loadSystemHealth();
+                await loadEnhancedStatistics();
+                await loadAllThreats();
+                
+                // Set up auto-refresh for enhanced monitoring
+                if (refreshInterval) clearInterval(refreshInterval);
+                refreshInterval = setInterval(async () => {
+                    try {
+                        await loadSystemHealth();
+                        await loadEnhancedStatistics();
+                        await loadAllThreats();
+                    } catch (error) {
+                        console.error('Refresh error:', error);
+                        addConsoleLog('critical', `Refresh error: ${error.message}`);
+                    }
+                }, 5000); // Refresh every 5 seconds
+                
+                // Set up console updates
+                if (consoleUpdateInterval) clearInterval(consoleUpdateInterval);
+                consoleUpdateInterval = setInterval(updateEnhancedConsole, 3000);
+                
+                // Update timestamp
+                updateTimestamp();
+                setInterval(updateTimestamp, 10000);
+                
+                addConsoleLog('info', 'Enhanced threat detection dashboard initialized successfully');
+                
+            } catch (error) {
+                addConsoleLog('critical', `Enhanced dashboard initialization failed: ${error.message}`);
+                console.error('Dashboard init error:', error);
+            }
+        }
+
+        // Enhanced console logging
+        function addConsoleLog(level, message) {
+            const consoleContent = document.getElementById('consoleContent');
+            if (!consoleContent) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-level-${level}`;
+            
+            let prefix = '';
+            switch(level) {
+                case 'critical': prefix = '[CRITICAL]'; break;
+                case 'high': prefix = '[HIGH]'; break;
+                case 'medium': prefix = '[MEDIUM]'; break;
+                case 'info': prefix = '[INFO]'; break;
+                case 'safe': prefix = '[SAFE]'; break;
+                default: prefix = '[INFO]';
+            }
+            
+            logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${prefix} ${message}`;
+            
+            consoleContent.appendChild(logEntry);
+            
+            // Auto-scroll if enabled
+            const autoScrollCheckbox = document.getElementById('autoScroll');
+            if (autoScrollCheckbox && autoScrollCheckbox.checked) {
+                consoleContent.scrollTop = consoleContent.scrollHeight;
+            }
+            
+            // Keep only last 200 log entries
+            const logEntries = consoleContent.querySelectorAll('.log-entry');
+            if (logEntries.length > 200) {
+                for (let i = 0; i < 50; i++) {
+                    if (logEntries[i]) logEntries[i].remove();
+                }
+            }
+        }
+
+        // Load enhanced statistics
+        async function loadEnhancedStatistics() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/statistics`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Statistics data received:', data);
+                
+                // Update counters - using session_stats which is what your backend actually tracks
+                const sessionStats = data.session_stats || {};
+                
+                document.getElementById('totalAnalyzed').textContent = sessionStats.total_analyzed || 0;
+                document.getElementById('criticalThreats').textContent = sessionStats.critical_threats || 0;
+                document.getElementById('highThreats').textContent = sessionStats.high_threats || 0;
+                document.getElementById('mediumThreats').textContent = sessionStats.medium_threats || 0;
+                document.getElementById('safeEmails').textContent = sessionStats.safe_emails || 0;
+                
+                // Update threat type counters
+                document.getElementById('phishingCount').textContent = sessionStats.phishing_detected || 0;
+                document.getElementById('malwareCount').textContent = sessionStats.malware_detected || 0;
+                document.getElementById('aptCount').textContent = sessionStats.apt_detected || 0;
+                document.getElementById('ddosCount').textContent = sessionStats.ddos_detected || 0;
+                document.getElementById('insiderCount').textContent = sessionStats.insider_threats_detected || 0;
+                
+                // Log activity
+                const totalThreats = (sessionStats.critical_threats || 0) + (sessionStats.high_threats || 0);
+                if (totalThreats > 0) {
+                    addConsoleLog('high', `ACTIVE THREATS: ${sessionStats.critical_threats || 0} critical, ${sessionStats.high_threats || 0} high risk detected`);
+                }
+                
+                // Update monitoring status
+                const systemStatusElement = document.getElementById('systemStatus');
+                if (systemStatusElement) {
+                    systemStatusElement.textContent = data.monitoring_active ? 'Active' : 'Stopped';
+                }
+                
+            } catch (error) {
+                console.error('Failed to load enhanced statistics:', error);
+                addConsoleLog('critical', `Enhanced statistics loading failed: ${error.message}`);
+                // Set default values on error
+                document.getElementById('totalAnalyzed').textContent = '0';
+                document.getElementById('criticalThreats').textContent = '0';
+                document.getElementById('highThreats').textContent = '0';
+                document.getElementById('mediumThreats').textContent = '0';
+                document.getElementById('safeEmails').textContent = '0';
+                document.getElementById('phishingCount').textContent = '0';
+                document.getElementById('malwareCount').textContent = '0';
+                document.getElementById('aptCount').textContent = '0';
+                document.getElementById('ddosCount').textContent = '0';
+                document.getElementById('insiderCount').textContent = '0';
+            }
+        }
+
+        // Enhanced threat display with detailed analysis
+        function displayThreats(threats) {
+            const container = document.getElementById('threatsContainer');
+            if (!container) return;
+            
+            if (!threats || threats.length === 0) {
+                displayNoThreats();
+                return;
+            }
+
+            container.innerHTML = threats.map(threat => {
+                const riskClass = getRiskClass(threat.risk_score || 0);
+                const riskPercentage = Math.round((threat.risk_score || 0) * 100);
+                
+                return `
+                    <div class="threat-item threat-${riskClass}">
+                        <div class="threat-header">
+                            <div class="threat-info">
+                                <h4>${truncateText(threat.sender || 'Unknown Sender', 70)}</h4>
+                                <div style="color: #666; font-size: 0.9em; margin: 8px 0;">
+                                    <strong>Subject:</strong> ${truncateText(threat.subject || 'No Subject', 100)}<br>
+                                    <strong>Analyzed:</strong> ${formatTimestamp(threat.timestamp)}<br>
+                                    <strong>Risk Level:</strong> ${threat.priority || getRiskLevelText(threat.risk_score || 0)}
+                                </div>
+                            </div>
+                            <div class="threat-badge badge-${riskClass}">
+                                ${riskPercentage}% Risk
+                            </div>
+                        </div>
+                        
+                        <div class="threat-details">
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">Overall Risk</div>
+                                <div class="threat-metric-value" style="color: ${getRiskColor(threat.risk_score || 0)}">
+                                    ${riskPercentage}%
+                                </div>
+                            </div>
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">Phishing</div>
+                                <div class="threat-metric-value">${Math.round(((threat.threat_types && threat.threat_types.phishing) || 0) * 100)}%</div>
+                            </div>
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">APT</div>
+                                <div class="threat-metric-value" style="color: #e17055">${Math.round(((threat.threat_types && threat.threat_types.apt) || 0) * 100)}%</div>
+                            </div>
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">Malware</div>
+                                <div class="threat-metric-value">${Math.round(((threat.threat_types && threat.threat_types.malware) || 0) * 100)}%</div>
+                            </div>
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">DDoS</div>
+                                <div class="threat-metric-value" style="color: #6c5ce7">${Math.round(((threat.threat_types && threat.threat_types.ddos) || 0) * 100)}%</div>
+                            </div>
+                            <div class="threat-metric">
+                                <div class="threat-metric-label">Insider</div>
+                                <div class="threat-metric-value" style="color: #fd79a8">${Math.round(((threat.threat_types && threat.threat_types.insider_threat) || 0) * 100)}%</div>
+                            </div>
+                        </div>
+                        
+                        ${threat.explanation ? `
+                            <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 10px; font-size: 0.9em;">
+                                <strong>Enhanced Analysis:</strong> ${truncateText(threat.explanation, 300)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            addConsoleLog('info', `Displayed ${threats.length} enhanced threat analysis results`);
+        }
+
+        // Enhanced system health check
+        async function loadSystemHealth() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/health`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update UI elements with null checks
+                const currentAccountElement = document.getElementById('currentAccount');
+                const systemHealthElement = document.getElementById('systemHealth');
+                const apiStatusElement = document.getElementById('apiStatus');
+                const systemHealthIndicator = document.getElementById('systemHealthIndicator');
+                
+                if (currentAccountElement) {
+                    currentAccountElement.textContent = data.current_account || 'Unknown';
+                }
+                
+                if (systemHealthElement) {
+                    systemHealthElement.textContent = data.status || 'Unknown';
+                }
+                
+                if (apiStatusElement) {
+                    apiStatusElement.textContent = data.status === 'healthy' ? 'Connected' : 'Error';
+                }
+                
+                // Update status indicators
+                if (systemHealthIndicator) {
+                    systemHealthIndicator.className = `status-indicator ${data.status === 'healthy' ? 'status-connected' : 'status-error'}`;
+                }
+                
+                // Update monitoring status
+                isMonitoring = data.monitoring_active !== false;
+                const toggleBtn = document.getElementById('monitoringToggle');
+                if (toggleBtn) {
+                    if (isMonitoring) {
+                        toggleBtn.textContent = 'Stop Monitoring';
+                        toggleBtn.className = 'btn btn-danger';
+                    } else {
+                        toggleBtn.textContent = 'Start Monitoring';
+                        toggleBtn.className = 'btn btn-success';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Health check failed:', error);
+                addConsoleLog('critical', `Health check failed: ${error.message}`);
+                
+                // Update UI to show error state
+                const apiStatusElement = document.getElementById('apiStatus');
+                const systemHealthIndicator = document.getElementById('systemHealthIndicator');
+                
+                if (apiStatusElement) apiStatusElement.textContent = 'Disconnected';
+                if (systemHealthIndicator) {
+                    systemHealthIndicator.className = 'status-indicator status-error';
+                }
+            }
+        }
+
+        async function loadAllThreats() {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/all-analysis?limit=100&min_risk=0.0`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Threats data received:', data);
+                
+                threatsData = data.analysis || [];
+                
+                if (threatsData.length > 0) {
+                    // Enhanced threat counting
+                    const threatCounts = {
+                        critical: threatsData.filter(t => (t.risk_score || 0) >= 0.85).length,
+                        high: threatsData.filter(t => (t.risk_score || 0) >= 0.7 && (t.risk_score || 0) < 0.85).length,
+                        medium: threatsData.filter(t => (t.risk_score || 0) >= 0.5 && (t.risk_score || 0) < 0.7).length
+                    };
+                    
+                    addConsoleLog('info', `Loaded ${threatsData.length} enhanced analysis results - Critical: ${threatCounts.critical}, High: ${threatCounts.high}`);
+                    
+                    if (threatCounts.critical > 0) {
+                        addConsoleLog('critical', `${threatCounts.critical} CRITICAL THREATS require immediate attention!`);
+                    }
+                }
+                
+                displayThreats(threatsData);
+                
+            } catch (error) {
+                console.error('Failed to load threats:', error);
+                addConsoleLog('critical', `Enhanced threat data loading failed: ${error.message}`);
+                displayNoThreats('Error loading enhanced threat data');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function updateEnhancedConsole() {
+            if (isMonitoring) {
+                const now = new Date();
+                if (now.getSeconds() % 20 === 0) {
+                    addConsoleLog('info', 'Enhanced AI monitoring active - analyzing threats with APT, Insider, DDoS detection...');
+                }
+            }
+        }
+
+        // Enhanced filtering
+        function filterThreats() {
+            const filter = document.getElementById('threatFilter').value;
+            let filteredThreats = [...threatsData];
+            
+            switch (filter) {
+                case 'critical':
+                    filteredThreats = threatsData.filter(t => (t.risk_score || 0) >= 0.85);
+                    break;
+                case 'high':
+                    filteredThreats = threatsData.filter(t => (t.risk_score || 0) >= 0.7);
+                    break;
+                case 'medium':
+                    filteredThreats = threatsData.filter(t => (t.risk_score || 0) >= 0.5);
+                    break;
+                case 'threats':
+                    filteredThreats = threatsData.filter(t => (t.risk_score || 0) >= 0.3);
+                    break;
+            }
+            
+            addConsoleLog('info', `Filtered to ${filteredThreats.length} items (${filter} threats)`);
+            displayThreats(filteredThreats);
+        }
+
+        // Test functions
+        async function testAdvancedThreatDetection() {
+            const testData = {
+                sender: 'it@corp.com',
+                subject: 'Network Traffic Surge - DDoS Attack Detected',
+                body: 'Massive traffic surge detected across all servers. Bandwidth exhaustion causing system overload. Multiple botnet signatures identified including Mirai and Zeus. Immediate DDoS mitigation protocols required.'
+            };
+            
+            await analyzeTestThreat(testData, 'Advanced Threat Detection Test');
+        }
+
+        async function testAPTDetection() {
+            const testData = {
+                sender: 'finance@company.com',
+                subject: 'Confidential: Q4 Financial Reports and Strategic Planning Documents',
+                body: 'Please review the attached quarterly financial reports and strategic planning documents. This contains sensitive merger and acquisition details that require immediate board-level review.'
+            };
+            
+            await analyzeTestThreat(testData, 'APT Detection Test');
+        }
+
+        async function testInsiderThreat() {
+            const testData = {
+                sender: 'employee@company.com',
+                subject: 'Looking for new career opportunities - need references',
+                body: 'I am exploring new job opportunities with competitors and need to backup some customer database files for my portfolio. Can you help me access the financial records and client lists?'
+            };
+            
+            await analyzeTestThreat(testData, 'Insider Threat Detection Test');
+        }
+
+        async function analyzeTestThreat(testData, testType) {
+            try {
+                addConsoleLog('high', `${testType}: ${testData.subject}`);
+                showLoading(true);
+                
+                const response = await fetch(`${apiBaseUrl}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                const riskPercentage = Math.round((result.overall_risk || 0) * 100);
+                
+                if ((result.overall_risk || 0) >= 0.85) {
+                    addConsoleLog('critical', `CRITICAL THREAT DETECTED: ${result.risk_level} (${riskPercentage}%)`);
+                } else if ((result.overall_risk || 0) >= 0.7) {
+                    addConsoleLog('high', `HIGH THREAT DETECTED: ${result.risk_level} (${riskPercentage}%)`);
+                } else {
+                    addConsoleLog('medium', `Threat analysis: ${result.risk_level} (${riskPercentage}%)`);
+                }
+                
+                const alertText = `${testType} Results:\n\nRisk Level: ${result.risk_level} (${riskPercentage}%)\nConfidence: ${Math.round((result.confidence || 0) * 100)}%\n\nThis would ${(result.overall_risk || 0) >= 0.85 ? 'TRIGGER CRITICAL RESPONSE' : (result.overall_risk || 0) >= 0.7 ? 'TRIGGER HIGH ALERT' : 'be monitored'}`;
+                
+                alert(alertText);
+                
+                await refreshAll();
+                
+            } catch (error) {
+                addConsoleLog('critical', `${testType} failed: ${error.message}`);
+                alert(`${testType} failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Utility functions
+        function displayNoThreats(message = null) {
+            const container = document.getElementById('threatsContainer');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="no-threats">
+                    <div class="icon">🛡️</div>
+                    <h3>${message || 'No threats detected'}</h3>
+                    <p>${message ? 'Please check system connection and try again.' : 
+                       'Enhanced threat detection system is monitoring in real-time.<br>All threats including APT, Insider Threats, and DDoS indicators will appear here as they are detected and analyzed.'}</p>
+                </div>
+            `;
+        }
+
+        function getRiskClass(score) {
+            if (score >= 0.85) return 'critical';
+            if (score >= 0.7) return 'high';
+            if (score >= 0.5) return 'medium';
+            if (score >= 0.3) return 'low';
+            return 'safe';
+        }
+
+        function getRiskColor(score) {
+            if (score >= 0.85) return '#ff6b6b';
+            if (score >= 0.7) return '#fd79a8';
+            if (score >= 0.5) return '#fdcb6e';
+            if (score >= 0.3) return '#74b9ff';
+            return '#00b894';
+        }
+
+        function getRiskLevelText(score) {
+            if (score >= 0.85) return 'CRITICAL';
+            if (score >= 0.7) return 'HIGH';
+            if (score >= 0.5) return 'MEDIUM';
+            if (score >= 0.3) return 'LOW';
+            return 'SAFE';
+        }
+
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            try {
+                return new Date(timestamp).toLocaleString();
+            } catch {
+                return timestamp.substring(0, 19).replace('T', ' ');
+            }
+        }
+
+        function updateTimestamp() {
+            const lastUpdateElement = document.getElementById('lastUpdate');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = new Date().toLocaleTimeString();
+            }
+        }
+
+        function showLoading(show) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = show ? 'inline-block' : 'none';
+            }
+        }
+
+        function clearConsole() {
+            const consoleContent = document.getElementById('consoleContent');
+            if (consoleContent) {
+                consoleContent.innerHTML = '';
+                addConsoleLog('info', 'Console cleared - enhanced monitoring continues');
+            }
+        }
+
+        // Control functions
+        async function toggleMonitoring() {
+            const endpoint = isMonitoring ? '/stop' : '/start';
+            
+            try {
+                addConsoleLog('info', `${isMonitoring ? 'Stopping' : 'Starting'} enhanced monitoring...`);
+                
+                const response = await fetch(`${apiBaseUrl}${endpoint}`, { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' || data.status === 'info') {
+                    addConsoleLog('info', data.message);
+                    await loadSystemHealth();
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+                
+            } catch (error) {
+                addConsoleLog('critical', `Error toggling monitoring: ${error.message}`);
+                alert(`Error changing monitoring status: ${error.message}`);
+            }
+        }
+
+        async function refreshAll() {
+            addConsoleLog('info', 'Refreshing all enhanced data...');
+            try {
+                await loadSystemHealth();
+                await loadEnhancedStatistics();
+                await loadAllThreats();
+                addConsoleLog('info', 'Enhanced data refresh complete');
+            } catch (error) {
+                addConsoleLog('critical', `Refresh failed: ${error.message}`);
+            }
+        }
+
+        async function refreshThreats() {
+            addConsoleLog('info', 'Refreshing enhanced threat analysis data...');
+            await loadAllThreats();
+        }
+
+        async function manualScan() {
+            if (!confirm('Start manual scan of recent emails? This will analyze up to 100 recent emails with enhanced AI models.')) return;
+            
+            try {
+                addConsoleLog('info', 'Starting enhanced manual scan...');
+                alert('Enhanced manual scan feature - would analyze recent emails with APT, Insider Threat, and DDoS detection');
+                
+            } catch (error) {
+                addConsoleLog('critical', `Enhanced manual scan failed: ${error.message}`);
+                alert('Enhanced manual scan failed');
+            }
+        }
+
+        function analyzeTestEmail() {
+            const testContent = prompt('Enter email content to analyze with enhanced AI:', 
+                'URGENT: Your account has been compromised. Please transfer $50,000 to secure account immediately.');
+                
+            if (testContent) {
+                testEnhancedEmailAnalysis(testContent);
+            }
+        }
+
+        async function testEnhancedEmailAnalysis(content) {
+            try {
+                addConsoleLog('info', 'Analyzing content with enhanced AI models...');
+                showLoading(true);
+                
+                const response = await fetch(`${apiBaseUrl}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender: 'test@example.com',
+                        subject: 'Enhanced AI Test Analysis',
+                        body: content
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                const riskPercentage = Math.round((result.overall_risk || 0) * 100);
+                
+                addConsoleLog('info', `Enhanced analysis complete: ${result.risk_level} (${riskPercentage}%)`);
+
+                const analysisResult = `Enhanced AI Email Analysis:\n\nRisk Level: ${result.risk_level} (${riskPercentage}%)\nConfidence: ${Math.round((result.confidence || 0) * 100)}%\n\nExplanation: ${result.explanation || 'No explanation provided'}`;
+
+                alert(analysisResult);
+                
+            } catch (error) {
+                addConsoleLog('critical', `Enhanced email analysis failed: ${error.message}`);
+                alert(`Enhanced email analysis failed: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function exportEnhancedData() {
+            addConsoleLog('info', 'Enhanced export functionality requested');
+            alert('Enhanced Export Data - Would generate comprehensive threat analysis report');
+        }
+
+        function clearThreatCache() {
+            if (confirm('Clear enhanced threat analysis cache? This will reset the display.')) {
+                threatsData = [];
+                displayNoThreats();
+                addConsoleLog('info', 'Enhanced threat analysis cache cleared');
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initEnhancedDashboard);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (consoleUpdateInterval) clearInterval(consoleUpdateInterval);
+        });
+    </script>
+</body>
+</html>
