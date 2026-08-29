@@ -1105,18 +1105,18 @@ class EnhancedGmailAPIClient:
                     os.remove('token.json')
                 creds = None
         
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(Request())
-            except Exception as e:
-                logger.error(f"Token refresh failed: {e}")
-                if os.path.exists('token.json'):
-                    os.remove('token.json')
-                creds = None
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    logger.error(f"Token refresh failed: {e}")
+                    if os.path.exists('token.json'):
+                        os.remove('token.json')
+                    creds = None
             
-            if not creds:
-                if not os.path.exists(self.credentials_path):
+        if not creds:
+            if not os.path.exists(self.credentials_path):
                     raise FileNotFoundError("Gmail API credentials file not found")
                 
                 flow = InstalledAppFlow.from_client_secrets_file(self.credentials_path, self.SCOPES)
