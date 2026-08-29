@@ -22,9 +22,6 @@ google-api-python-client==2.88.0
 flask==2.3.2
 requests==2.31.0
 
-# Async Processing
-asyncio==3.4.3
-
 # Utilities
 python-dotenv==1.0.0
 colorama==0.4.6
