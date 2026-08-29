@@ -17,7 +17,9 @@ google-auth==2.22.0
 google-auth-oauthlib==1.0.0
 google-auth-httplib2==0.1.0
 google-api-python-client==2.88.0
-
+pip>=25.0
+setuptools>=75.0
+wheel>=0.45.0
 # Web Framework and APIs
 flask==2.3.2
 requests==2.31.0
