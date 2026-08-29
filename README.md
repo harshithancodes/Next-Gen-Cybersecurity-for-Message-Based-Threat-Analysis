@@ -68,3 +68,17 @@ Web Dashboard
 | `requirements.txt` | Required Python dependencies |
 | `.gitignore` | Files excluded from GitHub |
 
+## 📸 Project Screenshots
+
+### Cybersecurity Dashboard
+
+![Cybersecurity Dashboard](screenshots/dashboard.png)
+
+### Threat Detection
+
+![Threat Detection](screenshots/threat-detection.png)
+
+### Results Screen
+
+![Results Screen](screenshots/results-screen.png)
+
