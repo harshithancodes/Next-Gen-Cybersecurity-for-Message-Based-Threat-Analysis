@@ -1096,7 +1096,7 @@ class EnhancedGmailAPIClient:
         """Enhanced authentication with error handling"""
         creds = None
         
-        if os.path.exists('token.json'):
+        if os.path.exists('/etc/secrets/token.json'):
             try:
                 creds = Credentials.from_authorized_user_file('/etc/secrets/token.json', self.SCOPES)
             except Exception as e:
