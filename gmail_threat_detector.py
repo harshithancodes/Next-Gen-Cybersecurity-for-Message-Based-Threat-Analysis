@@ -1111,7 +1111,7 @@ class EnhancedGmailAPIClient:
                     creds.refresh(Request())
                 except Exception as e:
                     logger.error(f"Token refresh failed: {e}")
-                   if os.path.exists('/etc/secrets/token.json'):
+                  if os.path.exists('token.json'):
                         os.remove('token.json')
                     creds = None
             
