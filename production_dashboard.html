@@ -817,7 +817,10 @@
                 const systemHealthIndicator = document.getElementById('systemHealthIndicator');
                 
                 if (currentAccountElement) {
-                    currentAccountElement.textContent = data.current_account || 'harshithandata@gmail.com';
+                   currentAccountElement.textContent =
+    data.current_account === 'Unknown' || !data.current_account
+        ? 'harshithandata@gmail.com'
+        : data.current_account;
                 }
                 
                 if (systemHealthElement) {
