@@ -2206,30 +2206,54 @@ if not self.detector.running:
 else:
     return jsonify({"status": "info", "message": "Already running"})
         
-        @self.app.route('/stop', methods=['POST'])
-        def stop_monitoring():
-            """Stop monitoring"""
-            self.detector.stop_monitoring()
-            return jsonify({"status": "success", "message": "Monitoring stopped"})
+        @self.app.route('/start', methods=['POST'])
+    @self.app.route('/start', methods=['POST'])
+    def start_monitoring(self):
+        """Start monitoring"""
+        if not self.detector.running:
+            if not self.detector.gmail_client:
+                try:
+                    self.detector.initialize_gmail('/etc/secrets/credentials.json')
+                except Exception as e:
+                    logger.error(f"Gmail initialization failed: {e}")
+                    return jsonify({
+                        "status": "error",
+                        "message": f"Gmail initialization failed: {e}"
+                    }), 500
+
+            threading.Thread(
+                target=self.run_monitoring,
+                daemon=True
+            ).start()
+
+            return jsonify({
+                "status": "success",
+                "message": "Enhanced monitoring started"
+            })
+        else:
+            return jsonify({
+                "status": "info",
+                "message": "Already running"
+            })
 
     def generate_minimal_dashboard(self):
         """Generate minimal dashboard if HTML file not found"""
         return """
-        <!DOCTYPE html>
-        <html><head><title>Enhanced Threat Detection</title></head>
-        <body>
-        <h1>Enhanced Gmail Threat Detection System</h1>
-        <p>Dashboard file not found. System is running with basic interface.</p>
-        <p>API Endpoints:</p>
-        <ul>
-        <li>/health - System health</li>
-        <li>/statistics - Threat statistics</li>
-        <li>/alerts - Threat alerts</li>
-        <li>/all-analysis - Analysis results</li>
-        </ul>
-        </body></html>
-        """
-    
+<!DOCTYPE html>
+<html><head><title>Enhanced Threat Detection</title></head>
+<body>
+<h1>Enhanced Gmail Threat Detection System</h1>
+<p>Dashboard file not found. System is running with basic interface.</p>
+<p>API Endpoints:</p>
+<ul>
+<li>/health - System health</li>
+<li>/statistics - Threat statistics</li>
+<li>/alerts - Threat alerts</li>
+<li>/all-analysis - Analysis results</li>
+</ul>
+</body></html>
+"""
+
     def get_risk_level_text(self, risk_score: float) -> str:
         """Get risk level text"""
         if risk_score >= 0.85:
