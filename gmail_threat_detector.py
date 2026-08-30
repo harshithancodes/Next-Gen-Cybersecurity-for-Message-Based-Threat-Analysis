@@ -1115,17 +1115,11 @@ class EnhancedGmailAPIClient:
                         os.remove('token.json')
                     creds = None
             
-        if not creds:
-            if not os.path.exists(self.credentials_path):
-                    raise FileNotFoundError("Gmail API credentials file not found")
-                
-                flow = InstalledAppFlow.from_client_secrets_file(self.credentials_path, self.SCOPES)
-                creds = flow.run_local_server(port=8080, open_browser=True)
-        
-        if creds:
-            with open('token.json', 'w') as token:
-                token.write(creds.to_json())
-        
+        if not creds or not creds.valid:
+            raise RuntimeError(
+                "Valid Gmail token not available in Render Secret Files."
+            )
+            
         self.service = build('gmail', 'v1', credentials=creds)
         
         try:
