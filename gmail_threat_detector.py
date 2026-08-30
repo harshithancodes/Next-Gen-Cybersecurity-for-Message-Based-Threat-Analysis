@@ -2203,8 +2203,8 @@ if not self.detector.running:
         "status": "success",
         "message": "Enhanced monitoring started"
     })
-            else:
-                return jsonify({"status": "info", "message": "Already running"})
+else:
+    return jsonify({"status": "info", "message": "Already running"})
         
         @self.app.route('/stop', methods=['POST'])
         def stop_monitoring():
