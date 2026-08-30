@@ -2187,12 +2187,22 @@ class ProductionThreatAPI:
         @self.app.route('/start', methods=['POST'])
         def start_monitoring():
             """Start monitoring"""
-            if not self.detector.running:
-                if not self.detector.gmail_client:
-                    return jsonify({"status": "error", "message": "Gmail client not initialized"}), 400
-                    
-                threading.Thread(target=self.run_monitoring, daemon=True).start()
-                return jsonify({"status": "success", "message": "Enhanced monitoring started"})
+if not self.detector.running:
+    if not self.detector.gmail_client:
+        try:
+            self.detector.initialize_gmail('/etc/secrets/credentials.json')
+        except Exception as e:
+            logger.error(f"Gmail initialization failed: {e}")
+            return jsonify({
+                "status": "error",
+                "message": f"Gmail initialization failed: {e}"
+            }), 500
+
+    threading.Thread(target=self.run_monitoring, daemon=True).start()
+    return jsonify({
+        "status": "success",
+        "message": "Enhanced monitoring started"
+    })
             else:
                 return jsonify({"status": "info", "message": "Already running"})
         
